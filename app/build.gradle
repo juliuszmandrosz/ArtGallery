@@ -106,6 +106,9 @@ dependencies {
     def destinations_version = "1.6.32-beta"
     implementation "io.github.raamcosta.compose-destinations:core:$destinations_version"
     ksp "io.github.raamcosta.compose-destinations:ksp:$destinations_version"
+
+    // Permissions
+    implementation 'com.google.accompanist:accompanist-permissions:0.24.11-rc'
 }
 
 kapt {

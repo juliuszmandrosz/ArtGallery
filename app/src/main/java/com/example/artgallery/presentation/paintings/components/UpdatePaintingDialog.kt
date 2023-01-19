@@ -12,7 +12,7 @@ import com.example.artgallery.domain.paintings.Painting
 fun UpdatePaintingDialog(
     painting: Painting,
     showDialog: MutableState<Boolean>,
-    viewModel: PaintingsViewModel = hiltViewModel(),
+    paintingsViewModel: PaintingsViewModel = hiltViewModel(),
 ) {
     var title by remember { mutableStateOf(painting.title) }
     AlertDialog(
@@ -27,7 +27,7 @@ fun UpdatePaintingDialog(
         },
         confirmButton = {
             Button(onClick = {
-                viewModel.updatePainting(painting.copy(title = title))
+                paintingsViewModel.updatePainting(painting.copy(title = title))
                 showDialog.value = false
             }) {
                 Text(text = "Update")

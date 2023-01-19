@@ -23,10 +23,10 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Destination
 @Composable
 fun PaintingsScreen(
-    viewModel: PaintingsViewModel = hiltViewModel(),
+    paintingsViewModel: PaintingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
-    val paintingsState by viewModel.paintingsState.collectAsState()
+    val paintingsState by paintingsViewModel.paintingsState.collectAsState()
 
     var title by remember { mutableStateOf("") }
 
@@ -49,7 +49,7 @@ fun PaintingsScreen(
                     label = { Text("Title") })
                 Spacer(Modifier.height(20.dp))
                 Button(onClick = {
-                    viewModel.addPainting(Painting(title = title, imageUrl = ""))
+                    paintingsViewModel.addPainting(Painting(title = title, imageUrl = ""))
                     title = ""
                 }) { Text("Submit") }
                 Spacer(Modifier.height(20.dp))

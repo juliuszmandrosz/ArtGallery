@@ -20,7 +20,7 @@ import com.example.artgallery.domain.paintings.Painting
 @Composable
 fun PaintingListItem(
     painting: Painting,
-    viewModel: PaintingsViewModel = hiltViewModel(),
+    paintingsViewModel: PaintingsViewModel = hiltViewModel(),
     ) {
     val showUpdateDialog = remember { mutableStateOf(false) }
     Row(
@@ -38,7 +38,7 @@ fun PaintingListItem(
                 Icon(Icons.Default.Edit, contentDescription = "Edit")
             }
             IconButton(onClick = {
-                viewModel.deletePainting(painting)
+                paintingsViewModel.deletePainting(painting)
             }) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete")
             }
