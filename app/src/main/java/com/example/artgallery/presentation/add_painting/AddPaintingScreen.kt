@@ -1,29 +1,24 @@
 package com.example.artgallery.presentation.add_painting
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import com.google.accompanist.permissions.rememberPermissionState
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.artgallery.application.add_painting.AddPaintingViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -49,6 +44,8 @@ fun AddPaintingScreen(
         }
     )
 
+    var title by remember { mutableStateOf("") }
+
     Scaffold(
         topBar = {
             TopAppBar(title = {
@@ -73,6 +70,12 @@ fun AddPaintingScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                OutlinedTextField(
+
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { androidx.compose.material3.Text("Title") })
+                Spacer(Modifier.height(20.dp))
 
                 if (addPaintingState.text != null) {
                     Text(
