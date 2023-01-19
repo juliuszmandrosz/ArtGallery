@@ -12,57 +12,78 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.artgallery.application.paintings.PaintingsViewModel
 import com.example.artgallery.domain.paintings.Painting
+import com.example.artgallery.presentation.destinations.AddPaintingScreenDestination
 import com.example.artgallery.presentation.paintings.components.PaintingListItem
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 
+@RootNavGraph(start = true)
+@Destination
 @Composable
 fun PaintingsScreen(
-    viewModel: PaintingsViewModel = hiltViewModel()
+    viewModel: PaintingsViewModel = hiltViewModel(),
+    navigator: DestinationsNavigator
 ) {
     val paintingsState by viewModel.paintingsState.collectAsState()
 
     var title by remember { mutableStateOf("") }
 
-    Column(
-        Modifier.fillMaxSize().padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
-            label = { Text("Title") })
-        Spacer(Modifier.height(20.dp))
-        Button(onClick = {
-            viewModel.addPainting(Painting(title = title, imageUrl = ""))
-            title = ""
-        }) { Text("Submit") }
-        Spacer(Modifier.height(20.dp))
-        when {
-            paintingsState.isLoading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            }
-
-            !paintingsState.errorMsg.isNullOrEmpty() -> {
-                Text(text = paintingsState.errorMsg ?: "Error")
-            }
-
-            paintingsState.paintings.isEmpty() -> {
-                Text(text = "No paintings")
-            }
-
-            paintingsState.paintings.isNotEmpty() -> {
-                LazyColumn {
-                    items(paintingsState.paintings.size) { i ->
-                        PaintingListItem(
-                            painting = paintingsState.paintings[i],
-                        )
+    Scaffold(
+        topBar = {
+                 TopAppBar(title = {
+                     Text(text = "Art Gallery")
+                 })
+        },
+        content = { padding ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Title") })
+                Spacer(Modifier.height(20.dp))
+                Button(onClick = {
+                    viewModel.addPainting(Painting(title = title, imageUrl = ""))
+                    title = ""
+                }) { Text("Submit") }
+                Spacer(Modifier.height(20.dp))
+                when {
+                    paintingsState.isLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
+
+                    !paintingsState.errorMsg.isNullOrEmpty() -> {
+                        Text(text = paintingsState.errorMsg ?: "Error")
+                    }
+
+                    paintingsState.paintings.isEmpty() -> {
+                        Text(text = "No paintings")
+                    }
+
+                    paintingsState.paintings.isNotEmpty() -> {
+                        LazyColumn {
+                            items(paintingsState.paintings.size) { i ->
+                                PaintingListItem(
+                                    painting = paintingsState.paintings[i],
+                                )
+                            }
+                        }
+                    }
+                }
+
+                FloatingActionButton(onClick = {
+                    navigator.navigate(AddPaintingScreenDestination())
+                }) {
+                    Icon(Icons.Filled.Add,"")
                 }
             }
         }
+    )
 
-        FloatingActionButton(onClick = {}) {
-            Icon(Icons.Filled.Add,"")
-        }
-    }
 }
