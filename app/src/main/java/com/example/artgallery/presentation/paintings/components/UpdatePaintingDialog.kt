@@ -1,9 +1,11 @@
 package com.example.artgallery.presentation.paintings.components
+
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.artgallery.application.paintings.PaintingsViewModel
 import com.example.artgallery.domain.paintings.Painting
@@ -14,7 +16,7 @@ fun UpdatePaintingDialog(
     showDialog: MutableState<Boolean>,
     paintingsViewModel: PaintingsViewModel = hiltViewModel(),
 ) {
-    var title by remember { mutableStateOf(painting.title) }
+    var title by rememberSaveable { mutableStateOf(painting.title) }
     AlertDialog(
         onDismissRequest = {
             showDialog.value = false
