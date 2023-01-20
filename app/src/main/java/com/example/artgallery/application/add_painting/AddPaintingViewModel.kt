@@ -34,19 +34,19 @@ class AddPaintingViewModel @Inject constructor(
                 when (result) {
                     is Wrapped.Success -> {
                         _addPaintingState.update {
-                            it.copy(imageUrl = result.data, isLoading = false)
+                            it.copy(imageUrl = result.data, isPaintingDrawing = false)
                         }
                     }
                     is Wrapped.Error -> {
                         _addPaintingState.update {
-                            it.copy(isLoading = false)
+                            it.copy(isPaintingDrawing = false)
                         }
                         Toast.makeText(_context, result.exception.message, Toast.LENGTH_SHORT)
                             .show()
                     }
                     is Wrapped.Loading -> {
                         _addPaintingState.update {
-                            it.copy(isLoading = true)
+                            it.copy(isPaintingDrawing = true)
                         }
                     }
                 }
@@ -60,12 +60,19 @@ class AddPaintingViewModel @Inject constructor(
                 is Wrapped.Success -> {
                     Toast.makeText(_context, "Painting added successfully", Toast.LENGTH_SHORT)
                         .show()
-                    _addPaintingState.update { it.copy(isSuccess = true) }
+                    _addPaintingState.update { it.copy(isSuccess = true, isPaintingAdding = false) }
                 }
                 is Wrapped.Error -> {
+                    _addPaintingState.update {
+                        it.copy(isPaintingAdding = false)
+                    }
                     Toast.makeText(_context, result.exception.message, Toast.LENGTH_SHORT).show()
                 }
-                is Wrapped.Loading -> {}
+                is Wrapped.Loading -> {
+                    _addPaintingState.update {
+                        it.copy(isPaintingAdding = true)
+                    }
+                }
             }
         }
     }

@@ -1,16 +1,27 @@
 package com.example.artgallery.infrastructure.paintings
 
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
+import com.bumptech.glide.Glide
+import com.example.artgallery.ArtGalleryApplication
 import com.example.artgallery.domain.paintings.Painting
 import com.example.artgallery.domain.paintings.PaintingsFacade
 import com.example.artgallery.domain.shared.Wrapped
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.util.*
 import javax.inject.Inject
 
 class PaintingsFacadeImpl @Inject constructor(
     private val _paintingDao: PaintingDao,
-    private val _paintingsApi: PaintingsApi
+    private val _paintingsApi: PaintingsApi,
+    private val _firebaseStorage: FirebaseStorage
 ) :
     PaintingsFacade {
     override suspend fun getPaintings(): Flow<Wrapped<List<Painting>>> {
@@ -30,7 +41,9 @@ class PaintingsFacadeImpl @Inject constructor(
         return flow {
             emit(Wrapped.Loading)
             try {
-                _paintingDao.insert(painting)
+                val imageBytes = convertImageUrlToByteArray(painting.imageUrl)
+                val imageUrl = uploadImageToFirebase(painting.id, imageBytes)
+                _paintingDao.insert(painting.copy(imageUrl = imageUrl))
                 emit(Wrapped.Success(Unit))
             } catch (e: Exception) {
                 emit(Wrapped.Error(Throwable(e.message)))
@@ -75,4 +88,22 @@ class PaintingsFacadeImpl @Inject constructor(
             }
         }.flowOn(Dispatchers.IO)
     }
+
+
+    private suspend fun convertImageUrlToByteArray(imageUrl: String) = withContext(Dispatchers.IO) {
+        val drawable =
+            Glide.with(ArtGalleryApplication.appContext).load(Uri.parse(imageUrl))
+                .submit().get()
+        val bitmap = (drawable as BitmapDrawable).bitmap
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        stream.toByteArray()
+    }
+
+    private suspend fun uploadImageToFirebase(paintingId: UUID, imageBytes: ByteArray) =
+        withContext(Dispatchers.IO) {
+            val storageRef = _firebaseStorage.reference.child("images/$paintingId")
+            storageRef.putBytes(imageBytes)
+                .await().storage.downloadUrl.await().toString()
+        }
 }

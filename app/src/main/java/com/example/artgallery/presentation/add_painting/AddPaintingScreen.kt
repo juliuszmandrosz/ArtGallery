@@ -60,16 +60,19 @@ fun AddPaintingScreen(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                if (title.isEmpty() || addPaintingState.imageUrl.isNullOrEmpty()) return@FloatingActionButton
-                addPaintingViewModel.addPainting(
-                    Painting(
-                        title = title,
-                        imageUrl = addPaintingState.imageUrl!!
+            when {
+                addPaintingState.isPaintingAdding -> CircularProgressIndicator()
+                !addPaintingState.isPaintingAdding -> FloatingActionButton(onClick = {
+                    if (title.isEmpty() || addPaintingState.imageUrl.isNullOrEmpty()) return@FloatingActionButton
+                    addPaintingViewModel.addPainting(
+                        Painting(
+                            title = title,
+                            imageUrl = addPaintingState.imageUrl!!
+                        )
                     )
-                )
-            }) {
-                Icon(Icons.Default.Save, "Save")
+                }) {
+                    Icon(Icons.Default.Save, "Save")
+                }
             }
         },
         topBar = {
@@ -91,7 +94,8 @@ fun AddPaintingScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
+                    .padding(padding)
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -122,7 +126,7 @@ fun AddPaintingScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
 
-                if (!addPaintingState.isLoading) {
+                if (!addPaintingState.isPaintingDrawing) {
                     Button(onClick = {
                         addPaintingViewModel.drawPainting()
                     }) {
@@ -131,7 +135,7 @@ fun AddPaintingScreen(
                 }
 
                 when {
-                    addPaintingState.isLoading -> {
+                    addPaintingState.isPaintingDrawing -> {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
 

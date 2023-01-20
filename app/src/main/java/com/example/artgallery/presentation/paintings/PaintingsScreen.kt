@@ -1,19 +1,23 @@
 package com.example.artgallery.presentation.paintings
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.artgallery.application.paintings.PaintingsViewModel
-import com.example.artgallery.domain.paintings.Painting
 import com.example.artgallery.presentation.destinations.AddPaintingScreenDestination
-import com.example.artgallery.presentation.paintings.components.PaintingListItem
+import com.example.artgallery.presentation.paintings.components.PaintingItem
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -28,31 +32,27 @@ fun PaintingsScreen(
 ) {
     val paintingsState by paintingsViewModel.paintingsState.collectAsState()
 
-    var title by remember { mutableStateOf("") }
-
     Scaffold(
         topBar = {
-                 TopAppBar(title = {
-                     Text(text = "Art Gallery")
-                 })
+            TopAppBar(title = {
+                Text(text = "Art Gallery")
+            })
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                navigator.navigate(AddPaintingScreenDestination())
+            }) {
+                Icon(Icons.Filled.Add, "")
+            }
         },
         content = { padding ->
             Column(
                 Modifier
                     .fillMaxSize()
-                    .padding(padding),
+                    .padding(padding)
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Title") })
-                Spacer(Modifier.height(20.dp))
-                Button(onClick = {
-                    paintingsViewModel.addPainting(Painting(title = title, imageUrl = ""))
-                    title = ""
-                }) { Text("Submit") }
-                Spacer(Modifier.height(20.dp))
                 when {
                     paintingsState.isLoading -> {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -67,21 +67,17 @@ fun PaintingsScreen(
                     }
 
                     paintingsState.paintings.isNotEmpty() -> {
-                        LazyColumn {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(3)
+                        ) {
                             items(paintingsState.paintings.size) { i ->
-                                PaintingListItem(
-                                    painting = paintingsState.paintings[i],
-                                )
+                                PaintingItem(paintingsState.paintings[i])
                             }
                         }
                     }
                 }
 
-                FloatingActionButton(onClick = {
-                    navigator.navigate(AddPaintingScreenDestination())
-                }) {
-                    Icon(Icons.Filled.Add,"")
-                }
+
             }
         }
     )

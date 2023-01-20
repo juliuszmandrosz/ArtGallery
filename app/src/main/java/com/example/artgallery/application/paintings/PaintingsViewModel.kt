@@ -29,24 +29,12 @@ class PaintingsViewModel @Inject constructor(
         getPaintings()
     }
 
-    fun addPainting(painting: Painting) = viewModelScope.launch {
-        _facade.addPainting(painting).collect { result ->
-            when (result) {
-                is Wrapped.Success -> {
-                    Toast.makeText(_context, "Painting added successfully", Toast.LENGTH_SHORT).show()
-                }
-                is Wrapped.Error -> {
-                    Toast.makeText(_context, result.exception.message, Toast.LENGTH_SHORT).show()
-                }
-                is Wrapped.Loading -> {}
-            }
-        }
-    }
     fun updatePainting(painting: Painting) = viewModelScope.launch {
         _facade.updatePainting(painting).collect { result ->
             when (result) {
                 is Wrapped.Success -> {
-                    Toast.makeText(_context, "Painting updated successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(_context, "Painting updated successfully", Toast.LENGTH_SHORT)
+                        .show()
                 }
                 is Wrapped.Error -> {
                     Toast.makeText(_context, result.exception.message, Toast.LENGTH_SHORT).show()
@@ -55,19 +43,7 @@ class PaintingsViewModel @Inject constructor(
             }
         }
     }
-    fun deletePainting(painting: Painting) = viewModelScope.launch {
-        _facade.deletePainting(painting).collect { result ->
-            when (result) {
-                is Wrapped.Success -> {
-                    Toast.makeText(_context, "Painting deleted successfully", Toast.LENGTH_SHORT).show()
-                }
-                is Wrapped.Error -> {
-                    Toast.makeText(_context, result.exception.message, Toast.LENGTH_SHORT).show()
-                }
-                is Wrapped.Loading -> {}
-            }
-        }
-    }
+
     private fun getPaintings() = viewModelScope.launch {
         _facade.getPaintings().collect { result ->
             when (result) {

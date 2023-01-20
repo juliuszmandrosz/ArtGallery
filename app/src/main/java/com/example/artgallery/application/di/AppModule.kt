@@ -8,6 +8,7 @@ import com.example.artgallery.infrastructure.ArtGalleryDatabase
 import com.example.artgallery.infrastructure.paintings.PaintingDao
 import com.example.artgallery.infrastructure.paintings.PaintingsApi
 import com.example.artgallery.infrastructure.paintings.PaintingsFacadeImpl
+import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -71,8 +72,19 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providePaintingsFacade(dao: PaintingDao, api: PaintingsApi): PaintingsFacade =
-        PaintingsFacadeImpl(dao, api)
+    fun provideFirebaseStorage(): FirebaseStorage =
+        FirebaseStorage.getInstance()
+
+
+    @Singleton
+    @Provides
+    fun providePaintingsFacade(
+        dao: PaintingDao,
+        api: PaintingsApi,
+        storage: FirebaseStorage
+    ): PaintingsFacade =
+        PaintingsFacadeImpl(dao, api, storage)
+
 
     private fun getHeaderInterceptor(): Interceptor {
         return Interceptor { chain ->
