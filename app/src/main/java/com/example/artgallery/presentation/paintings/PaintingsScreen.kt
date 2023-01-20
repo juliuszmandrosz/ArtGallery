@@ -35,15 +35,20 @@ fun PaintingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = {
-                Text(text = "Art Gallery")
-            })
+            TopAppBar(
+                title = {
+                    Text(text = "Art Gallery")
+                }, colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 navigator.navigate(AddPaintingScreenDestination())
             }) {
-                Icon(Icons.Filled.Add, "")
+                Icon(Icons.Filled.Add, "", tint = MaterialTheme.colorScheme.onPrimaryContainer)
             }
         },
         content = { padding ->
@@ -67,7 +72,7 @@ fun PaintingsScreen(
                         Text(text = "No paintings")
                     }
 
-                    paintingsState.paintings.isNotEmpty() -> {
+                    else -> {
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(3)
                         ) {
@@ -84,3 +89,4 @@ fun PaintingsScreen(
     )
 
 }
+

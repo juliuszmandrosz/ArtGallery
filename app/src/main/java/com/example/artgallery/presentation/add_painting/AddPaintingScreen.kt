@@ -3,7 +3,6 @@ package com.example.artgallery.presentation.add_painting
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Mic
@@ -64,7 +63,7 @@ fun AddPaintingScreen(
         floatingActionButton = {
             when {
                 addPaintingState.isPaintingAdding -> CircularProgressIndicator()
-                !addPaintingState.isPaintingAdding -> FloatingActionButton(onClick = {
+                else -> FloatingActionButton(onClick = {
                     if (title.isEmpty() || addPaintingState.imageUrl.isNullOrEmpty()) return@FloatingActionButton
                     addPaintingViewModel.addPainting(
                         Painting(
@@ -78,9 +77,10 @@ fun AddPaintingScreen(
             }
         },
         topBar = {
-            TopAppBar(title = {
-                Text(text = "Add Painting")
-            },
+            TopAppBar(
+                title = {
+                    Text(text = "Add Painting")
+                },
                 navigationIcon = {
                     IconButton(onClick = { navigator.navigateUp() }) {
                         Icon(
@@ -88,7 +88,11 @@ fun AddPaintingScreen(
                             contentDescription = "Back"
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
             )
         },

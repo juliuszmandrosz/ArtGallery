@@ -1,9 +1,11 @@
 package com.example.artgallery.presentation.paintings.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.artgallery.domain.paintings.Painting
 import com.example.artgallery.presentation.destinations.PaintingDetailsScreenDestination
@@ -18,7 +20,9 @@ fun PaintingItem(
         model = painting.imageUrl,
         contentDescription = painting.title,
         loading = {
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                Modifier.then(Modifier.size(8.dp))
+            )
         },
         modifier = Modifier.clickable {
             navigator.navigate(PaintingDetailsScreenDestination(painting))

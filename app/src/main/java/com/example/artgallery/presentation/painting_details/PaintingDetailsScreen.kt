@@ -1,7 +1,6 @@
 package com.example.artgallery.presentation.painting_details
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -35,9 +34,10 @@ fun PaintingDetailsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = {
-                Text(text = paintingDetailsState.painting!!.title)
-            },
+            TopAppBar(
+                title = {
+                    Text(text = paintingDetailsState.painting!!.title)
+                },
                 navigationIcon = {
                     IconButton(onClick = { navigator.navigateUp() }) {
                         Icon(
@@ -45,7 +45,11 @@ fun PaintingDetailsScreen(
                             contentDescription = "Back"
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
 
             )
         },

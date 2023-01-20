@@ -56,7 +56,6 @@ class PaintingsFacadeImpl @Inject constructor(
     }
 
     override suspend fun updatePainting(painting: Painting): Flow<Wrapped<Unit>> {
-
         return flow {
             emit(Wrapped.Loading)
             try {
