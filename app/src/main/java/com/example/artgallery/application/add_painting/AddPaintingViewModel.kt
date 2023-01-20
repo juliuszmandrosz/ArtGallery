@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddPaintingViewModel @Inject constructor(
-    private val _facade: PaintingsFacade,
+    private val _paintingsFacade: PaintingsFacade,
     @ApplicationContext private val _context: Context,
 ) : ViewModel() {
 
@@ -30,7 +30,7 @@ class AddPaintingViewModel @Inject constructor(
         val description = _addPaintingState.value.description
         if (description.isNullOrEmpty()) return
         viewModelScope.launch {
-            _facade.drawPainting(description).collect { result ->
+            _paintingsFacade.drawPainting(description).collect { result ->
                 when (result) {
                     is Wrapped.Success -> {
                         _addPaintingState.update {
@@ -55,7 +55,7 @@ class AddPaintingViewModel @Inject constructor(
     }
 
     fun addPainting(painting: Painting) = viewModelScope.launch {
-        _facade.addPainting(painting).collect { result ->
+        _paintingsFacade.addPainting(painting).collect { result ->
             when (result) {
                 is Wrapped.Success -> {
                     Toast.makeText(_context, "Painting added successfully", Toast.LENGTH_SHORT)
@@ -77,7 +77,7 @@ class AddPaintingViewModel @Inject constructor(
         }
     }
 
-    fun changeTextValue(text: String) {
+    fun changeDescriptionValue(text: String) {
         viewModelScope.launch {
             _addPaintingState.update {
                 it.copy(description = text)

@@ -46,7 +46,7 @@ fun AddPaintingScreen(
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
         contract = SpeechRecognizerContract(),
         onResult = {
-            addPaintingViewModel.changeTextValue(it.toString())
+            addPaintingViewModel.changeDescriptionValue(it.toString())
         }
     )
 
@@ -134,6 +134,8 @@ fun AddPaintingScreen(
                         Text(text = "Draw")
                     }
                 }
+
+                Spacer(modifier = Modifier.height(20.dp))
 
                 when {
                     addPaintingState.isPaintingDrawing -> {

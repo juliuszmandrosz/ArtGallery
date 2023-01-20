@@ -26,6 +26,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @RootNavGraph(start = true)
 @Destination
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 fun PaintingsScreen(
     paintingsViewModel: PaintingsViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
@@ -71,7 +72,7 @@ fun PaintingsScreen(
                             columns = GridCells.Fixed(3)
                         ) {
                             items(paintingsState.paintings.size) { i ->
-                                PaintingItem(paintingsState.paintings[i])
+                                PaintingItem(paintingsState.paintings[i], navigator)
                             }
                         }
                     }
