@@ -5,6 +5,6 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface PaintingsApi {
-    @POST("https://api.openai.com/v1/images/generations")
-    suspend fun createImage(@Body prompt: CreateImageRequest): Response<CreateImageResponse>
+    @POST("images/generations")
+    suspend fun createImage(@Body body: CreateImageRequest): Response<CreateImageResponse>
 }

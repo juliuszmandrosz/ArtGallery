@@ -8,6 +8,7 @@ import com.example.artgallery.infrastructure.ArtGalleryDatabase
 import com.example.artgallery.infrastructure.paintings.PaintingDao
 import com.example.artgallery.infrastructure.paintings.PaintingsApi
 import com.example.artgallery.infrastructure.paintings.PaintingsFacadeImpl
+import com.example.artgallery.infrastructure.translations.TranslationsApi
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -45,14 +46,6 @@ object AppModule {
     @Singleton
     fun provideGson(): Gson = GsonBuilder().setLenient().create()
 
-    @Singleton
-    @Provides
-    fun provideHttpClient(): OkHttpClient {
-        return OkHttpClient
-            .Builder()
-            .addInterceptor(getHeaderInterceptor())
-            .build()
-    }
 
     @Singleton
     @Provides
@@ -61,13 +54,23 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePaintingsApi(gson: Gson, client: OkHttpClient): PaintingsApi =
+    fun providePaintingsApi(gson: Gson): PaintingsApi =
         Retrofit.Builder()
             .baseUrl("https://api.openai.com/v1/")
-            .client(client)
+            .client(getPaintingHttpClient())
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(PaintingsApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideTranslationsApi(gson: Gson): TranslationsApi =
+        Retrofit.Builder()
+            .baseUrl("https://api-free.deepl.com/v2/")
+            .client(getTranslationsHttpClient())
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+            .create(TranslationsApi::class.java)
 
 
     @Singleton
@@ -80,17 +83,45 @@ object AppModule {
     @Provides
     fun providePaintingsFacade(
         dao: PaintingDao,
-        api: PaintingsApi,
-        storage: FirebaseStorage
+        paintingsApi: PaintingsApi,
+        storage: FirebaseStorage,
+        translationsApi: TranslationsApi
+
     ): PaintingsFacade =
-        PaintingsFacadeImpl(dao, api, storage)
+        PaintingsFacadeImpl(dao, paintingsApi, translationsApi, storage)
 
 
-    private fun getHeaderInterceptor(): Interceptor {
+    private fun getPaintingHttpClient(): OkHttpClient {
+        return OkHttpClient
+            .Builder()
+            .addInterceptor(getPaintingApiHeaderInterceptor())
+            .build()
+    }
+
+
+    private fun getTranslationsHttpClient(): OkHttpClient {
+        return OkHttpClient
+            .Builder()
+            .addInterceptor(getTranslationsApiHeaderInterceptor())
+            .build()
+    }
+
+    private fun getPaintingApiHeaderInterceptor(): Interceptor {
         return Interceptor { chain ->
             val request =
                 chain.request().newBuilder()
                     .header("Authorization", "Bearer ${BuildConfig.OPEN_AI_API_KEY}")
+                    .header("Content-Type", "application/json")
+                    .build()
+            chain.proceed(request)
+        }
+    }
+
+    private fun getTranslationsApiHeaderInterceptor(): Interceptor {
+        return Interceptor { chain ->
+            val request =
+                chain.request().newBuilder()
+                    .header("Authorization", "DeepL-Auth-Key ${BuildConfig.DEEPL_API_KEY}")
                     .header("Content-Type", "application/json")
                     .build()
             chain.proceed(request)

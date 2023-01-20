@@ -26,6 +26,7 @@ android {
         properties.load(project.rootProject.file("local.properties").newDataInputStream())
 
         buildConfigField "String", "OPEN_AI_API_KEY", "\"${properties.getProperty("OPEN_AI_API_KEY")}\""
+        buildConfigField "String", "DEEPL_API_KEY", "\"${properties.getProperty("DEEPL_API_KEY")}\""
 
     }
 
@@ -135,9 +136,6 @@ dependencies {
     //Image loading
     implementation 'io.coil-kt:coil:2.2.2'
 
-    // Translator
-    implementation 'com.google.mlkit:translate:17.0.1'
-
     // Coil
     implementation "io.coil-kt:coil-compose:2.2.2"
 
@@ -150,6 +148,11 @@ dependencies {
     def glide_version = "4.12.0"
     implementation "com.github.bumptech.glide:glide:$glide_version"
     kapt "com.github.bumptech.glide:compiler:$glide_version"
+
+
+    // ML kit translate
+    implementation 'com.google.firebase:firebase-ml-natural-language:22.0.0'
+    implementation 'com.google.firebase:firebase-ml-natural-language-translate-model:20.0.8'
 }
 
 kapt {
