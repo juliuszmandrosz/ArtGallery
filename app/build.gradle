@@ -20,6 +20,12 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+        buildConfigField "String", "OPEN_AI_API_KEY", "\"${properties.getProperty("OPEN_AI_API_KEY")}\""
+
     }
 
     buildTypes {
@@ -41,6 +47,7 @@ android {
     }
     buildFeatures {
         compose true
+        viewBinding true
     }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
@@ -109,6 +116,29 @@ dependencies {
 
     // Permissions
     implementation 'com.google.accompanist:accompanist-permissions:0.24.11-rc'
+
+    // Material icons
+    implementation "androidx.compose.material:material-icons-extended:1.3.1"
+
+    //Client
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.1'
+
+    //OkHttp Interceptor
+    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.1"
+
+    // Retrofit
+    def retrofit_version = "2.9.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
+    //Image loading
+    implementation 'io.coil-kt:coil:2.2.2'
+
+    // Translator
+    implementation 'com.google.mlkit:translate:17.0.1'
+
+    // Coil
+    implementation "io.coil-kt:coil-compose:2.2.2"
 }
 
 kapt {

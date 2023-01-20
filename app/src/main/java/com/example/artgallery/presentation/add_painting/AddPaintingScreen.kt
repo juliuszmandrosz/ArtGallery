@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,7 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.SubcomposeAsyncImage
 import com.example.artgallery.application.add_painting.AddPaintingViewModel
+import com.example.artgallery.domain.paintings.Painting
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -37,6 +41,7 @@ fun AddPaintingScreen(
         permissionState.launchPermissionRequest()
     }
 
+
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
         contract = SpeechRecognizerContract(),
         onResult = {
@@ -46,7 +51,27 @@ fun AddPaintingScreen(
 
     var title by remember { mutableStateOf("") }
 
+    when {
+        addPaintingState.isSuccess -> {
+            navigator.navigateUp()
+        }
+    }
+
+
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                if (title.isEmpty() || addPaintingState.imageUrl.isNullOrEmpty()) return@FloatingActionButton
+                addPaintingViewModel.addPainting(
+                    Painting(
+                        title = title,
+                        imageUrl = addPaintingState.imageUrl!!
+                    )
+                )
+            }) {
+                Icon(Icons.Default.Save, "Save")
+            }
+        },
         topBar = {
             TopAppBar(title = {
                 Text(text = "Add Painting")
@@ -71,27 +96,54 @@ fun AddPaintingScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 OutlinedTextField(
-
                     value = title,
                     onValueChange = { title = it },
-                    label = { androidx.compose.material3.Text("Title") })
+                    label = { Text("Title") })
                 Spacer(Modifier.height(20.dp))
 
-                if (addPaintingState.text != null) {
+                if (!addPaintingState.description.isNullOrEmpty()) {
                     Text(
-                        text = addPaintingState.text!!,
+                        text = addPaintingState.description!!,
                         fontSize = 24.sp
                     )
                 }
-                Spacer(modifier = Modifier.height(45.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                Button(onClick = {
-                    if (permissionState.status.isGranted) {
-                        speechRecognizerLauncher.launch(Unit)
-                    } else
-                        permissionState.launchPermissionRequest()
-                }) {
-                    Text(text = "Speak")
+                IconButton(
+                    onClick = {
+                        if (permissionState.status.isGranted) {
+                            speechRecognizerLauncher.launch(Unit)
+                        } else
+                            permissionState.launchPermissionRequest()
+                    }) {
+                    Icon(Icons.Filled.Mic, contentDescription = "Speak")
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+
+                if (!addPaintingState.isLoading) {
+                    Button(onClick = {
+                        addPaintingViewModel.drawPainting()
+                    }) {
+                        Text(text = "Draw")
+                    }
+                }
+
+                when {
+                    addPaintingState.isLoading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+
+                    !addPaintingState.imageUrl.isNullOrEmpty() -> {
+                        SubcomposeAsyncImage(
+                            model = addPaintingState.imageUrl,
+                            contentDescription = "Image",
+                            loading = {
+                                CircularProgressIndicator()
+                            }
+                        )
+                    }
                 }
 
             }

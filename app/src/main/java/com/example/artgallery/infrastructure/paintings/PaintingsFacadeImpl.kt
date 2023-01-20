@@ -8,10 +8,14 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
-class PaintingsFacadeImpl @Inject constructor(private val paintingDao: PaintingDao) : PaintingsFacade {
+class PaintingsFacadeImpl @Inject constructor(
+    private val _paintingDao: PaintingDao,
+    private val _paintingsApi: PaintingsApi
+) :
+    PaintingsFacade {
     override suspend fun getPaintings(): Flow<Wrapped<List<Painting>>> {
         return callbackFlow {
-            paintingDao.getAll().onStart {
+            _paintingDao.getAll().onStart {
                 trySend(Wrapped.Loading)
             }.catch { e ->
                 trySend(Wrapped.Error(Throwable(e.message)))
@@ -26,7 +30,7 @@ class PaintingsFacadeImpl @Inject constructor(private val paintingDao: PaintingD
         return flow {
             emit(Wrapped.Loading)
             try {
-                paintingDao.insert(painting)
+                _paintingDao.insert(painting)
                 emit(Wrapped.Success(Unit))
             } catch (e: Exception) {
                 emit(Wrapped.Error(Throwable(e.message)))
@@ -39,7 +43,7 @@ class PaintingsFacadeImpl @Inject constructor(private val paintingDao: PaintingD
         return flow {
             emit(Wrapped.Loading)
             try {
-                paintingDao.update(painting)
+                _paintingDao.update(painting)
                 emit(Wrapped.Success(Unit))
             } catch (e: Exception) {
                 emit(Wrapped.Error(Throwable(e.message)))
@@ -51,8 +55,21 @@ class PaintingsFacadeImpl @Inject constructor(private val paintingDao: PaintingD
         return flow {
             emit(Wrapped.Loading)
             try {
-                paintingDao.delete(painting)
+                _paintingDao.delete(painting)
                 emit(Wrapped.Success(Unit))
+            } catch (e: Exception) {
+                emit(Wrapped.Error(Throwable(e.message)))
+            }
+        }.flowOn(Dispatchers.IO)
+    }
+
+
+    override suspend fun drawPainting(description: String): Flow<Wrapped<String>> {
+        return flow {
+            emit(Wrapped.Loading)
+            try {
+                val res = _paintingsApi.createImage(CreateImageRequest(description))
+                emit(Wrapped.Success(res.body()!!.data.first().url))
             } catch (e: Exception) {
                 emit(Wrapped.Error(Throwable(e.message)))
             }

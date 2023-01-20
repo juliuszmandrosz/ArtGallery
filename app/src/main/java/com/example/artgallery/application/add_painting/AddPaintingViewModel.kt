@@ -19,18 +19,48 @@ import javax.inject.Inject
 @HiltViewModel
 class AddPaintingViewModel @Inject constructor(
     private val _facade: PaintingsFacade,
-    @ApplicationContext private val _context: Context
+    @ApplicationContext private val _context: Context,
 ) : ViewModel() {
 
     private val _addPaintingState = MutableStateFlow(AddPaintingState())
     val addPaintingState: StateFlow<AddPaintingState> = _addPaintingState.asStateFlow()
 
 
+    fun drawPainting() {
+        val description = _addPaintingState.value.description
+        if (description.isNullOrEmpty()) return
+        viewModelScope.launch {
+            _facade.drawPainting(description).collect { result ->
+                when (result) {
+                    is Wrapped.Success -> {
+                        _addPaintingState.update {
+                            it.copy(imageUrl = result.data, isLoading = false)
+                        }
+                    }
+                    is Wrapped.Error -> {
+                        _addPaintingState.update {
+                            it.copy(isLoading = false)
+                        }
+                        Toast.makeText(_context, result.exception.message, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    is Wrapped.Loading -> {
+                        _addPaintingState.update {
+                            it.copy(isLoading = true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fun addPainting(painting: Painting) = viewModelScope.launch {
         _facade.addPainting(painting).collect { result ->
             when (result) {
                 is Wrapped.Success -> {
-                    Toast.makeText(_context, "Painting added successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(_context, "Painting added successfully", Toast.LENGTH_SHORT)
+                        .show()
+                    _addPaintingState.update { it.copy(isSuccess = true) }
                 }
                 is Wrapped.Error -> {
                     Toast.makeText(_context, result.exception.message, Toast.LENGTH_SHORT).show()
@@ -40,10 +70,10 @@ class AddPaintingViewModel @Inject constructor(
         }
     }
 
-    fun changeTextValue(text: String){
+    fun changeTextValue(text: String) {
         viewModelScope.launch {
             _addPaintingState.update {
-                it.copy(text = text)
+                it.copy(description = text)
             }
         }
     }
