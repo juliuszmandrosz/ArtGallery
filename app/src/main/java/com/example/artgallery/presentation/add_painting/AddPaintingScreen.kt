@@ -42,7 +42,6 @@ fun AddPaintingScreen(
         permissionState.launchPermissionRequest()
     }
 
-
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
         contract = SpeechRecognizerContract(),
         onResult = {
@@ -51,6 +50,8 @@ fun AddPaintingScreen(
     )
 
     var title by rememberSaveable { mutableStateOf("") }
+
+    val description = addPaintingState.description
 
     when {
         addPaintingState.isSuccess -> {
@@ -106,9 +107,10 @@ fun AddPaintingScreen(
                     label = { Text("Title") })
                 Spacer(Modifier.height(20.dp))
 
-                if (!addPaintingState.description.isNullOrEmpty()) {
+
+                if (!description.isNullOrEmpty() && description != "null") {
                     Text(
-                        text = addPaintingState.description!!,
+                        text = description,
                         fontSize = 24.sp
                     )
                 }
